@@ -1,0 +1,88 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AddStructureCollide : MonoBehaviour
+{
+    // Start is called before the first frame update
+    void Start()
+    {
+        //StartCoroutine(DelayIntialize());
+    }
+
+    IEnumerator DelayIntialize()
+    {
+        yield return new WaitForSeconds(2f);
+        AddCollide();
+    }
+    public GameObject ROOT;
+    int i = 0;
+
+
+
+    public void AddCollide()
+    {
+        //Debug.Log("---001---"+ ROOT.name);
+        if (ROOT == null)
+            return;
+        foreach (var childRender in ROOT.GetComponentsInChildren<MeshRenderer>())
+        {
+            //Debug.Log("---002---");
+            //处理墙面数据
+            if (childRender.transform.name.Contains("Wall")&& (!childRender.transform.name.Contains("ref")))
+            {
+                //Debug.Log("---003---");
+                //实际运行时，有的wall父物体没有BoxCollider
+                if(childRender.transform.parent.GetComponent<BoxCollider>()!=null)
+                    childRender.transform.parent.GetComponent<BoxCollider>().enabled = false;
+                //Debug.Log("---004---");
+                if (childRender.transform != null)
+                {
+                    childRender.transform.localScale = new Vector3(childRender.transform.localScale.x, childRender.transform.localScale.y, -childRender.transform.localScale.z);
+                    childRender.transform.name = "Wall_ref_" + i.ToString();
+                    childRender.transform.gameObject.AddComponent<MeshCollider>();
+                    i++;
+                }
+                
+                //Debug.Log("---005---");
+            }
+            //处理地面数据
+            if (childRender.transform.name.Contains("Floor") && (!childRender.transform.name.Contains("GHolo")))
+            {
+                if (childRender.transform.parent.GetComponent<BoxCollider>() != null)
+                    childRender.transform.parent.GetComponent<BoxCollider>().enabled = false;
+                //Debug.Log("---004---");
+                if (childRender.transform != null)
+                {
+                    childRender.transform.localScale = new Vector3(childRender.transform.localScale.x, childRender.transform.localScale.y, -childRender.transform.localScale.z);
+                    childRender.transform.name = "Floor_GHolo" + i.ToString();
+                    childRender.transform.gameObject.AddComponent<MeshCollider>();
+                    i++;
+                }
+
+                //Debug.Log("---005---");
+            }
+
+        }
+    }
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            //Debug.Log("hihi2------");
+            foreach (var childRender in ROOT.GetComponentsInChildren<MeshRenderer>())
+            {
+                if (childRender.transform.name == "Wall")
+                {
+                    childRender.transform.parent.GetComponent<BoxCollider>().enabled = false;
+                    childRender.transform.localScale = new Vector3(childRender.transform.localScale.x, childRender.transform.localScale.y, -childRender.transform.localScale.z);
+                    childRender.transform.name = "Wall_ref_"+i.ToString();
+                    childRender.transform.gameObject.AddComponent<MeshCollider>();
+                    i++;
+                }
+                
+            }
+        }
+    }
+}
